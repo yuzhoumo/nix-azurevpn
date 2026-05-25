@@ -3,8 +3,8 @@
 NixOS module for the [Microsoft Azure VPN Client](https://learn.microsoft.com/en-us/azure/vpn-gateway/point-to-site-entra-vpn-client-linux).
 
 This module wraps the proprietary Microsoft Azure VPN client, sourced from the
-debian file. The module exposes both `azurevpnclient-unprivileged` and the
-privileged `azurevpnclient`.
+official debian file. The module exposes both `azurevpnclient-unprivileged` and
+the privileged `azurevpnclient` binaries.
 
 ### Unprivileged vs Privileged
 
