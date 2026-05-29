@@ -1,9 +1,26 @@
-{ pkgs, softwareRendering ? false }:
+{ pkgs, softwareRendering ? false, browser ? null }:
 
 let
   inherit (pkgs) lib stdenv fetchurl;
   pname = "microsoft-azurevpnclient";
   version = "3.0.0";
+
+  # Resolve the configured browser into an executable command. Accepts either a
+  # package (its main program is used) or a literal command string.
+  browserCommand =
+    if browser == null then null
+    else if lib.isString browser then browser
+    else lib.getExe browser;
+
+  # When a browser is configured, shadow xdg-open with a shim that opens URLs
+  # with that browser directly. On WSL, the real xdg-open detects the WSL
+  # environment and hands URLs to the Windows host browser via rundll32.exe;
+  # this shim keeps interactive auth inside WSL instead. The shim is placed
+  # ahead of xdg-utils in the client's PATH so the client picks it up.
+  browserShim = lib.optional (browserCommand != null)
+    (pkgs.writeShellScriptBin "xdg-open" ''
+      exec ${browserCommand} "$@"
+    '');
 
   runtimeLibs = with pkgs; [
     atk
@@ -58,7 +75,7 @@ in stdenv.mkDerivation {
       $out/bin/azurevpnclient-unprivileged \
       --set GTK_USE_PORTAL 1 \
       ${lib.optionalString softwareRendering "--set GALLIUM_DRIVER llvmpipe --set LIBGL_ALWAYS_SOFTWARE 1 \\"}
-      --prefix PATH : "${lib.makeBinPath (with pkgs; [ zenity xdg-utils ])}" \
+      --prefix PATH : "${lib.makeBinPath (browserShim ++ (with pkgs; [ zenity xdg-utils ]))}" \
       --prefix LD_LIBRARY_PATH : "$out/opt/microsoft/${pname}/lib"
 
     install -Dm644 usr/share/icons/${pname}.png \

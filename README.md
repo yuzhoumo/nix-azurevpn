@@ -49,14 +49,15 @@ programs.azurevpn.enable = true;
 
 ## Options
 
-| Option                                | Type           | Default         | Description                               |
-|---------------------------------------|----------------|-----------------|-------------------------------------------|
-| `programs.azurevpn.enable`            | bool           | `false`         | Enable the Azure VPN Client.              |
-| `programs.azurevpn.profileFile`       | string or null | `null`          | Path to a VPN profile XML file to deploy. |
-| `programs.azurevpn.profileName`       | string         | `"profile.xml"` | Filename for the imported profile.        |
-| `programs.azurevpn.profileUsers`      | string list    | `[]`            | Users to receive the deployed profile.    |
-| `programs.azurevpn.polkitGroup`       | string         | `"wheel"`       | Group allowed to manage DNS via polkit.   |
-| `programs.azurevpn.softwareRendering` | bool           | `false`         | Force software rendering.                 |
+| Option                                | Type                     | Default         | Description                               |
+|---------------------------------------|--------------------------|-----------------|-------------------------------------------|
+| `programs.azurevpn.enable`            | bool                     | `false`         | Enable the Azure VPN Client.              |
+| `programs.azurevpn.profileFile`       | string or null           | `null`          | Path to a VPN profile XML file to deploy. |
+| `programs.azurevpn.profileName`       | string                   | `"profile.xml"` | Filename for the imported profile.        |
+| `programs.azurevpn.profileUsers`      | string list              | `[]`            | Users to receive the deployed profile.    |
+| `programs.azurevpn.polkitGroup`       | string                   | `"wheel"`       | Group allowed to manage DNS via polkit.   |
+| `programs.azurevpn.softwareRendering` | bool                     | `false`         | Force software rendering.                 |
+| `programs.azurevpn.browser`           | package, string, or null | `null`          | Browser for interactive auth (see below). |
 
 ## Profile deployment
 
@@ -77,5 +78,22 @@ programs.azurevpn = {
   profileFile = config.sops.secrets.azure-vpn-profile.path;
   profileName = "MyVpnProfile.xml";
   profileUsers = [ "alice" ];
+};
+```
+
+## Interactive authentication browser (WSL)
+
+Entra ID sign-in opens a browser via `xdg-open`. On WSL, `xdg-open` detects the
+WSL environment and forwards the URL to the **Windows host** browser through
+`rundll32.exe`, so authentication happens outside WSL (and fails outright if
+Windows interop is unavailable, surfacing as `rundll32.exe: cannot execute
+binary file: Exec format error`).
+
+Set `browser` to open sign-in URLs with a Linux browser **inside** WSL instead:
+
+```nix
+programs.azurevpn = {
+  enable = true;
+  browser = "firefox";
 };
 ```

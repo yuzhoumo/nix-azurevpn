@@ -4,7 +4,7 @@ let
   cfg = config.programs.azurevpn;
   azureVpnPackage = import ./package.nix {
     inherit pkgs;
-    inherit (cfg) softwareRendering;
+    inherit (cfg) softwareRendering browser;
   };
 in
 {
@@ -57,6 +57,23 @@ in
         only. Works around the blank-window failure on WSLg, where EGL
         cannot initialize a usable GL implementation ("Failed to start
         Flutter renderer: No GL implementation is available").
+      '';
+    };
+
+    browser = lib.mkOption {
+      type = with lib.types; nullOr (either package str);
+      default = null;
+      example = lib.literalExpression "pkgs.firefox";
+      description = ''
+        Browser used to open interactive Entra ID (MSAL) sign-in URLs. Accepts
+        either a package (its main executable is used) or a command string.
+
+        When set, the client's wrapper shadows xdg-open with a shim that opens
+        URLs with this browser directly. This is primarily useful on WSL, where
+        the stock xdg-open detects the WSL environment and forwards URLs to the
+        Windows host browser via rundll32.exe; setting this keeps interactive
+        authentication inside WSL. Leave null to use the system's default
+        xdg-open handling.
       '';
     };
   };
