@@ -2,7 +2,10 @@
 
 let
   cfg = config.programs.azurevpn;
-  azureVpnPackage = import ./package.nix { inherit pkgs; };
+  azureVpnPackage = import ./package.nix {
+    inherit pkgs;
+    inherit (cfg) softwareRendering;
+  };
 in
 {
   options.programs.azurevpn = {
@@ -42,6 +45,18 @@ in
       description = ''
         Unix group whose members may control systemd-resolved via polkit,
         required for Azure VPN Client DNS management.
+      '';
+    };
+
+    softwareRendering = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Force software rendering for the Flutter-based client by setting
+        GALLIUM_DRIVER=llvmpipe and LIBGL_ALWAYS_SOFTWARE=1 in its wrapper
+        only. Works around the blank-window failure on WSLg, where EGL
+        cannot initialize a usable GL implementation ("Failed to start
+        Flutter renderer: No GL implementation is available").
       '';
     };
   };
