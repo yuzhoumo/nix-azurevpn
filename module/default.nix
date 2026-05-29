@@ -91,7 +91,8 @@ in
       capabilities = "cap_net_admin+eip";
     };
 
-    # Polkit rule to allow the VPN client to manage DNS via resolved
+    # Polkit rule to allow the VPN client to manage DNS via resolved.
+    security.polkit.enable = true;
     security.polkit.extraConfig = ''
       polkit.addRule(function(action, subject) {
         if (
