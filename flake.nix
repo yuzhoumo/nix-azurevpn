@@ -7,8 +7,8 @@
 
   outputs = { self, nixpkgs, ... }: {
     nixosModules = rec {
-      default = azurevpn;
-      azurevpn = import ./module;
+      default = azurevpnclient;
+      azurevpnclient = import ./module;
     };
   };
 }

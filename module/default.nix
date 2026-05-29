@@ -1,14 +1,14 @@
 { config, lib, pkgs, ... }:
 
 let
-  cfg = config.programs.azurevpn;
+  cfg = config.programs.azurevpnclient;
   azureVpnPackage = import ./package.nix {
     inherit pkgs;
     inherit (cfg) softwareRendering browser;
   };
 in
 {
-  options.programs.azurevpn = {
+  options.programs.azurevpnclient = {
     enable = lib.mkEnableOption "Microsoft Azure VPN Client";
 
     profileFile = lib.mkOption {
@@ -104,18 +104,18 @@ in
 
     # DigiCert root CA required for Azure VPN server validation
     environment.etc."ssl/certs/DigiCert_Global_Root_G2.pem".source =
-      pkgs.runCommand "azurevpn-digicert-global-root-g2.pem" { } ''
+      pkgs.runCommand "azurevpnclient-digicert-global-root-g2.pem" { } ''
         sed -n '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/p' \
           ${pkgs.cacert.unbundled}/etc/ssl/certs/DigiCert_Global_Root_G2:33af1e6a711a9a0bb2864b11d09fae5.crt > "$out"
       '';
 
     # Deploy VPN profile and register it in the Flutter client's preferences
-    system.activationScripts.azurevpn-profile = lib.mkIf (cfg.profileFile != null) {
+    system.activationScripts.azurevpnclient-profile = lib.mkIf (cfg.profileFile != null) {
       deps = [ "setupSecrets" ];
       text = let
         xmllint = "${pkgs.libxml2}/bin/xmllint";
         jq = "${pkgs.jq}/bin/jq";
-        deployProfile = pkgs.writeShellScript "azurevpn-deploy-profile" ''
+        deployProfile = pkgs.writeShellScript "azurevpnclient-deploy-profile" ''
           PROFILE_SRC="$1"
           PROFILE_NAME="$2"
           DATA_DIR="$3"

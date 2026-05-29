@@ -1,4 +1,4 @@
-# nix-azurevpn
+# nix-azurevpnclient
 
 NixOS module for the [Microsoft Azure VPN Client](https://learn.microsoft.com/en-us/azure/vpn-gateway/point-to-site-entra-vpn-client-linux).
 
@@ -25,15 +25,15 @@ Add the flake input and import the module:
 ```nix
 # flake.nix
 {
-  inputs.nix-azurevpn = {
-    url = "github:yuzhoumo/nix-azurevpn";
+  inputs.nix-azurevpnclient = {
+    url = "github:yuzhoumo/nix-azurevpnclient";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, nix-azurevpn, ... }: {
+  outputs = { nixpkgs, nix-azurevpnclient, ... }: {
     nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
       modules = [
-        nix-azurevpn.nixosModules.default
+        nix-azurevpnclient.nixosModules.default
         # ...
       ];
     };
@@ -44,20 +44,20 @@ Add the flake input and import the module:
 Enable in your NixOS configuration:
 
 ```nix
-programs.azurevpn.enable = true;
+programs.azurevpnclient.enable = true;
 ```
 
 ## Options
 
-| Option                                | Type                     | Default         | Description                               |
-|---------------------------------------|--------------------------|-----------------|-------------------------------------------|
-| `programs.azurevpn.enable`            | bool                     | `false`         | Enable the Azure VPN Client.              |
-| `programs.azurevpn.profileFile`       | string or null           | `null`          | Path to a VPN profile XML file to deploy. |
-| `programs.azurevpn.profileName`       | string                   | `"profile.xml"` | Filename for the imported profile.        |
-| `programs.azurevpn.profileUsers`      | string list              | `[]`            | Users to receive the deployed profile.    |
-| `programs.azurevpn.polkitGroup`       | string                   | `"wheel"`       | Group allowed to manage DNS via polkit.   |
-| `programs.azurevpn.softwareRendering` | bool                     | `false`         | Force software rendering.                 |
-| `programs.azurevpn.browser`           | package, string, or null | `null`          | Browser for interactive auth (see below). |
+| Option                                      | Type                     | Default         | Description                               |
+|---------------------------------------------|--------------------------|-----------------|-------------------------------------------|
+| `programs.azurevpnclient.enable`            | bool                     | `false`         | Enable the Azure VPN Client.              |
+| `programs.azurevpnclient.profileFile`       | string or null           | `null`          | Path to a VPN profile XML file to deploy. |
+| `programs.azurevpnclient.profileName`       | string                   | `"profile.xml"` | Filename for the imported profile.        |
+| `programs.azurevpnclient.profileUsers`      | string list              | `[]`            | Users to receive the deployed profile.    |
+| `programs.azurevpnclient.polkitGroup`       | string                   | `"wheel"`       | Group allowed to manage DNS via polkit.   |
+| `programs.azurevpnclient.softwareRendering` | bool                     | `false`         | Force software rendering.                 |
+| `programs.azurevpnclient.browser`           | package, string, or null | `null`          | Browser for interactive auth (see below). |
 
 ## Profile deployment
 
@@ -68,14 +68,14 @@ registers it in the Flutter client's `shared_preferences.json`.
 Example with [sops-nix](https://github.com/Mic92/sops-nix):
 
 ```nix
-sops.secrets.azure-vpn-profile = {
+sops.secrets.azurevpnclient-profile = {
   sopsFile = ./secrets/azvpn-profile.xml;
   format = "binary";
 };
 
-programs.azurevpn = {
+programs.azurevpnclient = {
   enable = true;
-  profileFile = config.sops.secrets.azure-vpn-profile.path;
+  profileFile = config.sops.secrets.azurevpnclient-profile.path;
   profileName = "MyVpnProfile.xml";
   profileUsers = [ "alice" ];
 };
@@ -92,7 +92,7 @@ binary file: Exec format error`).
 Set `browser` to open sign-in URLs with a Linux browser **inside** WSL instead:
 
 ```nix
-programs.azurevpn = {
+programs.azurevpnclient = {
   enable = true;
   browser = "firefox";
 };
