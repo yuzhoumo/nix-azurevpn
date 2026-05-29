@@ -49,13 +49,14 @@ programs.azurevpn.enable = true;
 
 ## Options
 
-| Option                           | Type           | Default         | Description                               |
-|----------------------------------|----------------|-----------------|-------------------------------------------|
-| `programs.azurevpn.enable`       | bool           | `false`         | Enable the Azure VPN Client.              |
-| `programs.azurevpn.profileFile`  | string or null | `null`          | Path to a VPN profile XML file to deploy. |
-| `programs.azurevpn.profileName`  | string         | `"profile.xml"` | Filename for the imported profile.        |
-| `programs.azurevpn.profileUsers` | string list    | `[]`            | Users to receive the deployed profile.    |
-| `programs.azurevpn.polkitGroup`  | string         | `"wheel"`       | Group allowed to manage DNS via polkit.   |
+| Option                                | Type           | Default         | Description                               |
+|---------------------------------------|----------------|-----------------|-------------------------------------------|
+| `programs.azurevpn.enable`            | bool           | `false`         | Enable the Azure VPN Client.              |
+| `programs.azurevpn.profileFile`       | string or null | `null`          | Path to a VPN profile XML file to deploy. |
+| `programs.azurevpn.profileName`       | string         | `"profile.xml"` | Filename for the imported profile.        |
+| `programs.azurevpn.profileUsers`      | string list    | `[]`            | Users to receive the deployed profile.    |
+| `programs.azurevpn.polkitGroup`       | string         | `"wheel"`       | Group allowed to manage DNS via polkit.   |
+| `programs.azurevpn.softwareRendering` | bool           | `false`         | Force software rendering.                 |
 
 ## Profile deployment
 
