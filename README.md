@@ -57,7 +57,7 @@ programs.azurevpnclient.enable = true;
 | `programs.azurevpnclient.profileUsers`      | string list              | `[]`            | Users to receive the deployed profile.    |
 | `programs.azurevpnclient.polkitGroup`       | string                   | `"wheel"`       | Group allowed to manage DNS via polkit.   |
 | `programs.azurevpnclient.softwareRendering` | bool                     | `false`         | Force software rendering.                 |
-| `programs.azurevpnclient.browser`           | package, string, or null | `null`          | Browser for interactive auth (see below). |
+| `programs.azurevpnclient.browser`           | package, string, or null | `null`          | Browser for interactive auth.             |
 
 ## Profile deployment
 
@@ -81,19 +81,25 @@ programs.azurevpnclient = {
 };
 ```
 
-## Interactive authentication browser (WSL)
+## WSL Compatability
 
-Entra ID sign-in opens a browser via `xdg-open`. On WSL, `xdg-open` detects the
-WSL environment and forwards the URL to the **Windows host** browser through
-`rundll32.exe`, so authentication happens outside WSL (and fails outright if
-Windows interop is unavailable, surfacing as `rundll32.exe: cannot execute
-binary file: Exec format error`).
-
-Set `browser` to open sign-in URLs with a Linux browser **inside** WSL instead:
+Use the following settings for compatability with nixos-wsl.
 
 ```nix
+# disable auto-generated resolv conf
+wsl.wslConf.network.generateResolvConf = false;
+
+# set default resolved dns to wsl endpoint, with cloudflare as fallback
+networking.nameservers = [ "10.255.255.254" "1.1.1.1" ];
+
 programs.azurevpnclient = {
   enable = true;
+
+  # set browser to launch inside of WSL, otherwise client uses xdg-open, which
+  # will route to the Windows host's browser for entra auth.
   browser = "firefox";
+
+  # enable software rendering to fix blank window issue on WSL
+  softwareRendering = true;
 };
 ```
